@@ -9,7 +9,9 @@ class AddTask extends React.Component {
       columns: props.columns,
       task: {
         project_id: props.project_id,
-      }
+        completionStatus: props.column
+      },
+      toggleAddTask: props.toggleAddTask
     }
   }
   inputTaskDetails(e) {
@@ -28,20 +30,11 @@ class AddTask extends React.Component {
     task.project_id = nextProps.project_id
     this.setState({columns:nextProps.columns, task})
   }
-  renderColumnOptions(columns) {
-    return (
-      <select name="completionStatus" onChange={(e) => this.inputTaskDetails(e)}>
-        <option selected disabled>Pick a column</option>
-        {columns.map((column) => this.renderColumnOption(column))}
-      </select>
-    )
-  }
-  renderColumnOption(column) {
-    return <option value={column.column_value}>{column.column_name}</option>
-  }
+
   render() {
     return (
       <div className="newtask">
+        <button onClick={() => this.state.toggleAddTask()} >Cancel</button>
       <form className="AddTaskForm" onSubmit={(e) => this.submitTask(e)}>
         <label>Task Name
           <input name="taskName" onChange={(e) => this.inputTaskDetails(e)}></input>
@@ -55,7 +48,6 @@ class AddTask extends React.Component {
         <label>Display Name
           <input name="userName" onChange={(e) => this.inputTaskDetails(e)}></input>
         </label>
-        {this.renderColumnOptions(this.state.columns)}
         <input type="submit" value="Add Task"/>
       </form>
       </div>

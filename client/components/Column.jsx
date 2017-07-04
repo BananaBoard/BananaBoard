@@ -7,28 +7,56 @@ import HTML5Backend from 'react-dnd-html5-backend';
 import ColumnHeader from './ColumnHeader'
 import {updateStatus} from '../actions'
 import Task from './Task'
+import AddTask from './addTask'
 
-const Column = (props) => {
-  return (
-    <div className="tasklist three columns">
-      <ColumnHeader name={props.name} column={props.column}/>
-      <ul>
-        {matchColumn(props.column.column_value, props.tasks).map((task, i) =>
-          <Task task={task} key={i} selected={task.id == props.selectedTask}/>
-        )}
-        <button><Link to={'/addTask'} className="addTaskButton">Add Task</Link></button>
-      </ul>
-    </div>
-  )
+class Column extends React.Component {
+  constructor(props) {
+    super(props)
+    console.log({props});
+    const {columns, tasks, selectedTask, column} = props
+    this.state = {
+      showAddTask: false,
+      tasks,
+      columns,
+      column,
+      selectedTask,
+      name
+    }
+  }
+  componentWillReceiveProps({tasks, columns, selectedTask, column}) {
+    this.setState({tasks, columns, selectedTask, column})
+  }
+  matchColumn(col, tasks) {
+    return tasks.filter((task) => task.completionStatus == col)
+  }
+  toggleAddTask() {
+    let showAddTask = !this.state.showAddTask
+    this.setState({showAddTask})
+  }
+  render() {
+    const {showAddTask, tasks, columns, selectedTask, column, name} = this.state
+    return (
+      <div className="tasklist three columns">
+        <ColumnHeader name={name} column={column}/>
+        <ul>
+          {this.matchColumn(column.column_value, tasks).map((task, i) =>
+            <Task task={task} key={i} selected={task.id == selectedTask}/>
+          )}
+          {showAddTask
+            ? <AddTask colummn={column.column_value} toggleAddTask={() => this.toggleAddTask()}/>
+            : <button onClick={() => this.toggleAddTask()} className="addTaskButton">Add Task</button>
+
+          }
+        </ul>
+      </div>
+    )
+  }
 }
 
-function matchColumn(col, tasks) {
-  return tasks.filter((task) => task.completionStatus == col)
-}
 
 const mapStateToProps = (state) => {
-  return {tasks: state.projectInfo.tasks,
-    columns: state.projectInfo.columns,
+  return {tasks: state.tasks,
+    columns: state.columns,
     selectedTask: state.selectedTask
   }
 }
